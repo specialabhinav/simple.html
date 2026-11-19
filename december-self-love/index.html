@@ -253,7 +253,7 @@ async function initSync(){
       if(!db||!user)throw new Error("na");
       const id=await user.id();
       const col=db.collection("data/users/"+id), ref=col.doc("state"), refY=col.doc("y27");
-      const rd=async r=>{const snap=await r.get();try{const ex=typeof snap.exists==="function"?snap.exists():snap.exists;if(ex!==false)return typeof snap.data==="function"?snap.data():snap.data}catch(e){}return null};
+      const rd=async r=>{const snap=await r.get();try{const ex=typeof snap.exists==="function"?snap.exists():snap.exists;if(ex!==false){const v=typeof snap.data==="function"?snap.data():snap.data;return v?JSON.parse(JSON.stringify(v)):null}}catch(e){}return null};
       const [d,yd]=await Promise.all([rd(ref),rd(refY)]);
       remote=ref;remoteY=refY;
       const has=y=>!!(y&&(y.theme||y.vision||(y.items&&y.items.length)));
