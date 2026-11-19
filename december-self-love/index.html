@@ -87,6 +87,18 @@ select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--
 .note{margin-top:6px;padding:6px 10px!important;font-size:12.5px!important}
 .qsel{width:auto!important;padding:4px 6px!important;font-size:12px!important;border-radius:8px!important}
 .footer{text-align:center;color:var(--mute);font-size:12px;margin-top:24px}
+input[type=date],input[type=search]{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:9px 12px;font:14px Inter;min-height:42px;-webkit-appearance:none;appearance:none}
+.jnav{display:flex;gap:8px;align-items:center}
+.rb{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--ink);font-size:20px;cursor:pointer;flex:0 0 auto}
+.je{border-top:1px solid var(--line);padding:12px 0}
+.je:first-child{border-top:0}
+.je .tm{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.je p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.lk{border:0;background:none;color:var(--rose);font:500 12px Inter;cursor:pointer;padding:4px 6px;border-radius:8px}
+.jday{display:flex;justify-content:space-between;gap:8px;width:100%;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px Fraunces,Georgia,serif;padding:14px 0 4px;cursor:pointer;text-align:left}
+.jday span{font:12px Inter;color:var(--mute);white-space:nowrap}
+.jprev{font-size:13.5px;margin:4px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere}
+.jprev small{color:var(--mute);margin-right:6px}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
 </head>
@@ -99,7 +111,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
     </div>
   </div>
 
-  <div class="tabs"><button class="tab on" data-tab="dec">December</button><button class="tab" data-tab="y27">2027 ✨</button></div>
+  <div class="tabs"><button class="tab on" data-tab="dec">December</button><button class="tab" data-tab="y27">2027 ✨</button><button class="tab" data-tab="jr">Journal 📓</button></div>
 
   <div id="viewDec">
   <div class="card quote">
@@ -170,6 +182,22 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
         <button class="btn full" id="add27">Add to 2027</button>
       </div>
       <details style="margin-top:14px"><summary>Need ideas? Tap to add</summary><div class="pills" id="sug27"></div></details>
+    </div>
+  </div>
+
+  <div id="viewJ" class="hide">
+    <div class="card">
+      <div class="jnav"><button class="rb" id="jPrev" aria-label="Previous day">‹</button><input type="date" id="jDate" aria-label="Journal date"><button class="rb" id="jNext" aria-label="Next day">›</button></div>
+      <div class="row" style="margin-top:14px"><h2 class="grow" id="jTitle"></h2><button class="pill" id="jToday">Back to today</button></div>
+      <textarea id="jText" style="min-height:120px"></textarea>
+      <div class="row" style="margin-top:10px"><button class="btn" id="jAdd">Save entry</button><span class="sub" id="jMsg"></span></div>
+      <div id="jList" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <h2>All entries</h2>
+      <div class="stats" id="jStats"></div>
+      <input type="search" id="jFind" placeholder="Search my journal…" style="margin-top:12px">
+      <div id="jAll"></div>
     </div>
   </div>
 
@@ -264,6 +292,7 @@ async function initSync(){
       else dirty.y27=1;
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       render();render27();
+      try{jInit(col.doc("journal").collection("days"))}catch(e){setSync("Couldn't load journal ("+e.message+")")}
       if(dirty.dec||dirty.y27)await push();else setSync("☁️ Synced to your profile");
     })(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),10000))]);
   }catch(e){remote=null;setSync("Offline · saved on this device only"+(e&&e.message!=="na"?" ("+(e.code||e.message)+")":""))}
@@ -378,8 +407,8 @@ function render27(){
 }
 function flash27(m){$("sum27").textContent=m;setTimeout(render27,2500)}
 function add27(t,c,w){S.y27.items.push({id:uid(),t,c,q:w,s:0,note:""});save("y27");render27()}
-function showTab(t){tab=t;$("viewDec").classList.toggle("hide",t!=="dec");$("view27").classList.toggle("hide",t!=="y27");
-  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));if(t==="y27")render27();window.scrollTo(0,0)}
+function showTab(t){tab=t;$("viewDec").classList.toggle("hide",t!=="dec");$("view27").classList.toggle("hide",t!=="y27");$("viewJ").classList.toggle("hide",t!=="jr");
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));if(t==="y27")render27();if(t==="jr")renderJ();window.scrollTo(0,0)}
 $("cat27").innerHTML=CATS.map(([c,e])=>`<option value="${c}">${e} ${c}</option>`).join("");
 $("when27").innerHTML=WHENS.map(([w,r])=>`<option value="${w}">${w==="Anytime"?"Anytime":w+" ("+r+")"}</option>`).join("");
 document.addEventListener("click",e=>{
@@ -404,6 +433,90 @@ document.addEventListener("change",e=>{
 $("new27").addEventListener("keydown",e=>{if(e.key==="Enter")$("add27").click()});
 $("theme27").addEventListener("input",e=>{S.y27.theme=e.target.value;save("y27")});
 $("vision27").addEventListener("input",e=>{S.y27.vision=e.target.value;save("y27")});
+
+// ---------- Journal tab ----------
+// Stored one document per day: data/users/<id>/journal/days/<YYYY-MM-DD> = {date, entries:[{id,at,text}], upd}
+const JKEY="selflove-journal-v1";
+const JPROMPTS=["What's on my mind right now?","What made me smile today?","What do I need more of this week?","One thing I handled well today…","What am I grateful for?","What drained me, and what filled me back up?","If I were my own best friend, what would I tell me today?","What did I learn about myself today?"];
+let J=(()=>{try{const v=JSON.parse(localStorage.getItem(JKEY));if(v&&typeof v==="object")return v}catch(e){}return{}})();
+let remoteJ=null,jq={},jEdit=null,jShow=14,jFind="",jMsgT=0;
+const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const kdate=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
+const todayKey=()=>dkey(new Date());
+let jSel=todayKey();
+const jEntries=k=>((J[k]&&J[k].entries)||[]).slice().sort((a,b)=>a.at-b.at);
+const jTime=at=>new Date(at).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+const jLong=k=>kdate(k).toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+function jLocal(){try{localStorage.setItem(JKEY,JSON.stringify(J))}catch(e){}}
+function jMsg(m){$("jMsg").textContent=m;clearTimeout(jMsgT);jMsgT=setTimeout(()=>{$("jMsg").textContent=""},2500)}
+function jPush(k){
+  if(!remoteJ||!J[k])return;
+  const body=JSON.parse(JSON.stringify({date:k,entries:J[k].entries,upd:J[k].upd}));
+  setSync("Saving…");
+  jq[k]=(jq[k]||Promise.resolve()).then(()=>remoteJ.doc(k).set(body)).then(
+    ()=>setSync("☁️ Synced to your profile"),
+    e=>setSync("Couldn't sync journal · saved on this device ("+((e&&(e.code||e.message))||"unknown")+")"));
+}
+function jTouch(k){J[k].upd=Date.now();jLocal();jPush(k);renderJ()}
+async function jInit(c){
+  try{
+    const snap=await c.get(),ru={};
+    snap.docs.forEach(s=>{const v=typeof s.data==="function"?s.data():s.data;if(!v)return;
+      const r=JSON.parse(JSON.stringify(v)),k=s.id;ru[k]=r.upd||0;
+      if(!J[k]||(r.upd||0)>=(J[k].upd||0))J[k]={entries:Array.isArray(r.entries)?r.entries:[],upd:r.upd||0}});
+    remoteJ=c;jLocal();
+    Object.keys(J).forEach(k=>{if(!(k in ru)||(J[k].upd||0)>ru[k])jPush(k)});
+    renderJ();
+  }catch(e){setSync("Couldn't load journal · saved on this device ("+((e&&(e.code||e.message))||"unknown")+")")}
+}
+function jStreak(){let d=new Date(),n=0;if(!jEntries(dkey(d)).length)d.setDate(d.getDate()-1);
+  while(jEntries(dkey(d)).length){n++;d.setDate(d.getDate()-1)}return n}
+function renderJ(){
+  const isToday=jSel===todayKey();
+  $("jDate").value=jSel;
+  $("jTitle").textContent=isToday?"Today · "+kdate(jSel).toLocaleDateString(undefined,{day:"numeric",month:"long"}):jLong(jSel);
+  $("jToday").classList.toggle("hide",isToday);
+  const dn=Math.round(kdate(jSel)/864e5);
+  $("jText").placeholder=JPROMPTS[((dn%JPROMPTS.length)+JPROMPTS.length)%JPROMPTS.length]+"\n\nWrite as many entries as you like through the day.";
+  const es=jEntries(jSel);
+  $("jList").innerHTML=!es.length?`<div class="sub" style="padding:10px 0">No entries for this day yet.</div>`:es.map(x=>jEdit===x.id
+    ?`<div class="je"><div class="tm">${jTime(x.at)} · editing</div><textarea id="jEditText">${esc(x.text)}</textarea><div class="row" style="margin-top:8px"><button class="btn" data-jsave="${x.id}">Save</button><button class="pill" data-jcancel="1">Cancel</button></div></div>`
+    :`<div class="je"><div class="tm"><span class="grow">${jTime(x.at)}${x.ed?" · edited":""}</span><button class="lk" data-je="${x.id}">Edit</button><button class="x" data-jdel="${x.id}" title="Delete entry">×</button></div><p>${esc(x.text)}</p></div>`).join("");
+  const days=Object.keys(J).filter(k=>jEntries(k).length).sort().reverse();
+  const total=days.reduce((a,k)=>a+jEntries(k).length,0);
+  $("jStats").innerHTML=`<div class="stat"><b>${total}</b><span>entries</span></div><div class="stat"><b>${days.length}</b><span>days written</span></div><div class="stat"><b>${jStreak()}🔥</b><span>day streak</span></div>`;
+  const q=jFind.trim().toLowerCase();
+  const hits=days.map(k=>[k,jEntries(k).filter(x=>!q||x.text.toLowerCase().includes(q))]).filter(([,xs])=>xs.length);
+  $("jAll").innerHTML=!days.length?`<div class="sub" style="padding:12px 0">Your entries will collect here, day by day.</div>`
+    :!hits.length?`<div class="sub" style="padding:12px 0">No entries match “${esc(jFind.trim())}”.</div>`
+    :hits.slice(0,jShow).map(([k,xs])=>`<button class="jday" data-jd="${k}">${esc(jLong(k))}<span>${xs.length} ${xs.length===1?"entry":"entries"} ›</span></button>`+xs.map(x=>`<div class="jprev"><small>${jTime(x.at)}</small>${esc(x.text)}</div>`).join("")).join("")
+      +(hits.length>jShow?`<div class="row" style="margin-top:12px"><button class="pill" id="jMore">Show older days</button></div>`:"");
+}
+function jShift(n){const d=kdate(jSel);d.setDate(d.getDate()+n);jSel=dkey(d);jEdit=null;renderJ()}
+function jAdd(){const v=$("jText").value.trim();
+  if(!v){$("jText").focus();jMsg("Write something first ✍️");return}
+  J[jSel]=J[jSel]&&Array.isArray(J[jSel].entries)?J[jSel]:{entries:[],upd:0};
+  J[jSel].entries=J[jSel].entries.concat([{id:uid(),at:Date.now(),text:v}]);
+  $("jText").value="";jTouch(jSel);jMsg("Saved ✓")}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.id==="jAdd"){jAdd();return}
+  if(t.id==="jPrev"){jShift(-1);return}
+  if(t.id==="jNext"){jShift(1);return}
+  if(t.id==="jToday"){jSel=todayKey();jEdit=null;renderJ();return}
+  if(t.id==="jMore"){jShow+=14;renderJ();return}
+  if(t.dataset.jd){jSel=t.dataset.jd;jEdit=null;renderJ();window.scrollTo(0,0);return}
+  if(t.dataset.je){jEdit=t.dataset.je;renderJ();const ta=$("jEditText");if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
+  if(t.dataset.jcancel){jEdit=null;renderJ();return}
+  if(t.dataset.jsave){const v=$("jEditText").value.trim();if(!v){jMsg("An entry can't be empty. Use × to delete it.");return}
+    J[jSel].entries=J[jSel].entries.map(x=>x.id===t.dataset.jsave?Object.assign({},x,{text:v,ed:Date.now()}):x);jEdit=null;jTouch(jSel);jMsg("Updated ✓");return}
+  if(t.dataset.jdel){if(t.dataset.armed){J[jSel].entries=J[jSel].entries.filter(x=>x.id!==t.dataset.jdel);jTouch(jSel);jMsg("Deleted")}
+    else{t.dataset.armed=1;t.textContent="delete?";t.style.fontSize="12px";setTimeout(()=>{if(t.isConnected)renderJ()},2500)}return}
+});
+$("jDate").addEventListener("change",e=>{if(/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)){jSel=e.target.value;jEdit=null;renderJ()}});
+$("jFind").addEventListener("input",e=>{jFind=e.target.value;jShow=14;renderJ()});
+$("jText").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();jAdd()}});
+renderJ();
 render27();
 render();
 initSync();
