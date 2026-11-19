@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>December · Coming Home to Myself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf5ef;--card:#fffdfa;--ink:#2e2622;--mute:#8a7d74;--line:#eadfd3;--rose:#c8665b;--rose2:#f3d9d3;--sage:#6f8f72;--sage2:#dde8dc;--gold:#d9a441}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1816;--card:#262020;--ink:#f1e8e0;--mute:#a1948a;--line:#3a312d;--rose:#e0877c;--rose2:#4a2f2b;--sage:#8fb092;--sage2:#2c3a2d;--gold:#e5b95c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,.serif{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0}
+h1{font-size:28px;line-height:1.15}
+h2{font-size:18px}
+.sub{color:var(--mute);font-size:13px;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px}
+.quote{background:linear-gradient(135deg,var(--rose2),var(--card));}
+.quote q{display:block;font-family:Fraunces,serif;font-style:italic;font-size:20px;line-height:1.4;quotes:none}
+.quote .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--rose);font-weight:600;margin-bottom:8px}
+.quote .nudge{margin-top:12px;font-size:13px;color:var(--mute)}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.grow{flex:1}
+.days{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:thin}
+.day{flex:0 0 auto;width:36px;height:44px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font:500 13px Inter;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.day small{font-size:9px;color:var(--mute)}
+.day.sel{background:var(--rose);border-color:var(--rose);color:#fff}.day.sel small{color:#ffe}
+.day.today{box-shadow:0 0 0 2px var(--gold) inset}
+.day.full{background:var(--sage2)}.day.sel.full{background:var(--rose)}
+.ring{width:84px;height:84px;position:relative;flex:0 0 auto}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 18px Fraunces,serif}
+.stats{display:flex;gap:10px;margin-top:12px}
+.stat{flex:1;background:var(--bg);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font:600 20px Fraunces,serif}.stat span{font-size:11px;color:var(--mute)}
+.goal{border-top:1px solid var(--line);padding:12px 0}
+.goal:first-of-type{border-top:0}
+.goal .top{display:flex;align-items:center;gap:10px}
+.chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;cursor:pointer;flex:0 0 auto;color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center}
+.chk.on{background:var(--sage);border-color:var(--sage)}
+.gname{font-weight:500}
+.meta{font-size:12px;color:var(--mute)}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:8px}
+.x:hover{color:var(--rose)}
+.bar{height:6px;background:var(--line);border-radius:6px;margin:8px 0 6px 38px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sage);border-radius:6px}
+.dots{display:flex;gap:3px;margin-left:38px;flex-wrap:wrap}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--sage)}.dots i.cur{outline:2px solid var(--rose);outline-offset:1px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 12px;border-radius:99px;font:13px Inter;cursor:pointer}
+.pill:hover{border-color:var(--rose)}.pill.added{opacity:.45;cursor:default}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+input[type=text],textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 12px;font:14px Inter}
+textarea{resize:vertical;min-height:70px;margin-top:8px}
+.btn{background:var(--rose);color:#fff;border:0;border-radius:12px;padding:10px 16px;font:500 14px Inter;cursor:pointer}
+.moods{display:flex;gap:8px;margin-top:8px}
+.mood{font-size:26px;background:none;border:2px solid transparent;border-radius:14px;padding:4px 8px;cursor:pointer;filter:grayscale(.7);opacity:.7}
+.mood.on{border-color:var(--rose);filter:none;opacity:1}
+.strip{display:flex;gap:3px;margin-top:12px}
+.strip i{flex:1;height:18px;border-radius:4px;background:var(--line)}
+.m1{background:#9aa4b8!important}.m2{background:#b9b3c9!important}.m3{background:#e2cf9f!important}.m4{background:#e9ae86!important}.m5{background:#d9776b!important}
+.hide{display:none}
+details summary{cursor:pointer;font-weight:500}
+.goal .tg{width:56px;padding:3px 6px;border-radius:8px;font:13px Inter;text-align:center}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--line);color:var(--mute);white-space:nowrap}
+.badge.ok{background:var(--sage2);color:var(--sage)}.badge.bad{background:var(--rose2);color:var(--rose)}
+.step{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.step button{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:16px;cursor:pointer;line-height:1}
+.step b{min-width:22px;text-align:center;font-weight:600}
+.addrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.addrow .full{grid-column:1/-1}
+select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 12px;font:14px Inter}
+.hint{font-size:12px;color:var(--mute);margin-top:6px}
+.tabs{display:flex;gap:6px;margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px}
+.tab{flex:1;border:0;background:none;color:var(--mute);padding:9px;border-radius:10px;font:500 14px Inter;cursor:pointer}
+.tab.on{background:var(--rose);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid var(--line);background:none;color:var(--ink);border-radius:99px;padding:5px 11px;font:12px Inter;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.qh{font:600 13px Fraunces,serif;color:var(--rose);margin:16px 0 4px;letter-spacing:.04em}
+.it{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.st{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:none;font-size:15px;cursor:pointer;color:var(--mute);flex:0 0 auto}
+.st.s1{border-color:var(--gold);color:var(--gold)}.st.s2{background:var(--sage);border-color:var(--sage);color:#fff}
+.it .done{text-decoration:line-through;color:var(--mute)}
+.note{margin-top:6px;padding:6px 10px!important;font-size:12.5px!important}
+.qsel{width:auto!important;padding:4px 6px!important;font-size:12px!important;border-radius:8px!important}
+.footer{text-align:center;color:var(--mute);font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row">
+    <div class="grow">
+      <h1>Coming home to myself</h1>
+      <div class="sub" id="dateline"></div>
+    </div>
+  </div>
+
+  <div class="tabs"><button class="tab on" data-tab="dec">December</button><button class="tab" data-tab="y27">2027 ✨</button></div>
+
+  <div id="viewDec">
+  <div class="card quote">
+    <div class="tag">Today's thought</div>
+    <q id="quote"></q>
+    <div class="nudge" id="nudge"></div>
+  </div>
+
+  <div class="card">
+    <div class="days" id="days"></div>
+    <div class="row" style="margin-top:6px">
+      <div class="ring" id="ring"></div>
+      <div class="grow">
+        <h2 id="dayTitle"></h2>
+        <div class="sub" id="daySub"></div>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card">
+    <div class="row"><h2 class="grow">December goals</h2><span class="sub">log each day · progress counts toward the monthly target</span></div>
+    <div id="goals"></div>
+    <div class="addrow">
+      <input type="text" id="newGoal" class="full" placeholder="New goal, e.g. Yoga session" maxlength="60">
+      <select id="newKind"><option value="days">Tick the days I do it</option><option value="total">Count a running total</option><option value="book">Book: pages per day + finish date</option></select>
+      <input type="number" id="newTarget" min="1" placeholder="Monthly target (e.g. 12)">
+      <input type="text" id="newUnit" class="full" placeholder="Unit (days, sessions, books, pages, km…)" maxlength="16">
+      <button class="btn full" id="addBtn">Add goal</button>
+    </div>
+    <div class="hint">“Tick the days” = did it or not that day. “Running total” = add up amounts, like km or glasses. “Book” = log pages daily and mark the day you finish.</div>
+    <details style="margin-top:14px">
+      <summary>Need ideas? Tap to add</summary>
+      <div class="pills" id="menu"></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Check in with me</h2>
+    <div class="sub">How am I feeling today?</div>
+    <div class="moods" id="moods"></div>
+    <textarea id="note" placeholder="One kind thing I did for myself, or something I noticed today…"></textarea>
+    <div class="sub" style="margin-top:14px">Mood across December</div>
+    <div class="strip" id="strip"></div>
+  </div>
+
+  </div>
+
+  <div id="view27" class="hide">
+    <div class="card quote">
+      <div class="tag">2027 · with myself, for myself</div>
+      <div id="themeView"></div>
+      <div id="themeEdit">
+        <input type="text" id="theme27" placeholder="My word or theme for 2027…" maxlength="40" style="font-family:Fraunces,serif;font-size:18px">
+        <textarea id="vision27" placeholder="When I look back on 2027, what do I want to have lived, felt and become?"></textarea>
+        <div class="row" style="margin-top:10px"><button class="btn" id="saveTheme">Save</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row"><h2 class="grow">My 2027 list</h2><span class="sub" id="sum27"></span></div>
+      <div class="stats" id="stats27"></div>
+      <div class="chips" id="chips27"></div>
+      <div id="list27"></div>
+      <div class="addrow">
+        <input type="text" id="new27" class="full" placeholder="Something I want to do for myself in 2027…" maxlength="100">
+        <select id="cat27"></select>
+        <select id="when27"></select>
+        <button class="btn full" id="add27">Add to 2027</button>
+      </div>
+      <details style="margin-top:14px"><summary>Need ideas? Tap to add</summary><div class="pills" id="sug27"></div></details>
+    </div>
+  </div>
+
+  <div class="footer">Be gentle. Missing a day doesn't break anything — you just begin again. 🤍<br><span id="sync">Connecting to your profile…</span></div>
+</div>
+
+<script>
+const QUOTES=[
+"You are allowed to be both a work in progress and a masterpiece.",
+"Start where you are. Speak to yourself as you would to someone you love.",
+"Rest is not a reward. It's part of the work of becoming.",
+"The relationship you have with yourself sets the tone for every other one.",
+"You don't have to earn gentleness. You can simply begin with it.",
+"Quiet is not empty. It's where your own voice finally gets room.",
+"Today, choose the choice that your future self will thank you for.",
+"Healing is rarely loud. Mostly it's small, kind, repeated things.",
+"You are not behind. You are on your own timeline.",
+"Notice what you need before the world asks what it needs from you.",
+"Being alone and being lonely are different rooms. Learn the way into the first.",
+"You can outgrow old versions of yourself without being ashamed of them.",
+"Boundaries are how love protects itself.",
+"What if you were already enough, and the work is just remembering it?",
+"Be the kind of friend to yourself that you'd be proud to be to someone else.",
+"Progress can look like simply showing up tired and doing one small thing.",
+"Your feelings are visitors, not verdicts. Let them come and go.",
+"Spend one hour today with no one's expectations but your own.",
+"Curiosity is a kinder tool than criticism. Ask yourself: what do I really want?",
+"You are allowed to take up space, in a room and in your own life.",
+"Joy is a legitimate goal. Put it on the list.",
+"Comparison steals the present. Come back to your own breath.",
+"Every time you keep a promise to yourself, trust grows a little.",
+"Forgive yourself for not knowing what you didn't yet know.",
+"The version of you that is learning to be kind to you is already here.",
+"Not everything needs fixing. Some things just need witnessing.",
+"Choose one thing today purely because it makes you feel alive.",
+"You've survived every hard day so far. That is a real kind of strength.",
+"Self-love isn't a feeling you wait for. It's a thing you practise.",
+"Look back at December and thank the person who kept showing up: you.",
+"A new year doesn't need a new you. It just needs the real one, rested."];
+const NUDGES=[
+"Try this today: put your phone away for 30 minutes and just be.",
+"Try this today: write down three things your body did for you.",
+"Try this today: cook or order something that truly feels like care.",
+"Try this today: say 'no' to one thing that drains you.",
+"Try this today: take a walk with no music, no destination.",
+"Try this today: tell yourself one thing you're proud of.",
+"Try this today: sit somewhere pretty and do nothing for 10 minutes."];
+// [emoji, name, kind, target, unit]
+const MENU=[["🏃","Walk/run 6 km+","days",10,"sessions"],["🎧","15-min walk, no headphones","days",20,"days"],["📖","Read a book","book",1,"book"],["📓","Journal / morning pages","days",20,"days"],["🧘","Meditate 10 min","days",15,"days"],["💬","Speak kindly to myself","days",31,"days"],["🌙","In bed by 11 pm","days",20,"days"],["📵","One phone-free hour","days",15,"days"],["🏋️","Workout","days",12,"sessions"],["🍲","Cook a nourishing meal","days",12,"days"],["☕","Solo date with myself","total",4,"dates"],["🙏","Write 3 gratitudes","days",25,"days"],["🎨","Do something creative","days",10,"days"],["🌿","Time in nature / sunlight","days",15,"days"],["💧","Drink enough water","days",25,"days"]];
+const MOODS=["😔","😕","😐","🙂","🥰"];
+const KEY="selflove-dec-v2";
+const uid=()=>Math.random().toString(36).slice(2,9);
+function fresh(){return{goals:[
+ {id:uid(),e:"🏃",n:"Walk/run 6 km+",k:"days",t:10,u:"sessions"},
+ {id:uid(),e:"🎧",n:"15-min walk, no headphones",k:"days",t:20,u:"days"},
+ {id:uid(),e:"📖",n:"Read a book",k:"book",t:1,u:"book"}],done:{},fin:{},mood:{},note:{},y27:{theme:"",vision:"",items:[]}}}
+function norm(x){x.y27=x.y27||{};x.y27.theme=x.y27.theme||"";x.y27.vision=x.y27.vision||"";x.y27.items=x.y27.items||[];x.fin=x.fin||{};x.done=x.done||{};x.mood=x.mood||{};x.note=x.note||{};
+  x.goals.forEach(g=>{if(g.n==="Read a book"&&g.k==="total"){g.k="book";g.u="book";delete x.done[g.id]}});return x}
+function load(){try{const r=localStorage.getItem(KEY);if(r)return norm(JSON.parse(r))}catch(e){}return fresh()}
+let remote=null,remoteY=null,dirty={dec:0,y27:0},syncTimer=0;
+const setSync=t=>{const el=document.getElementById("sync");if(el)el.textContent=t};
+function save(w){const t=Date.now();if(w==="y27")S.y27.upd=t;else S.upd=t;
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(remote){dirty[w==="y27"?"y27":"dec"]=1;setSync("Saving…");clearTimeout(syncTimer);syncTimer=setTimeout(push,700)}}
+async function push(){syncTimer=0;
+  try{
+    if(dirty.dec){dirty.dec=0;const rest=Object.assign({},S);delete rest.y27;await remote.set(JSON.parse(JSON.stringify(rest)))}
+    if(dirty.y27){dirty.y27=0;await remoteY.set(JSON.parse(JSON.stringify(S.y27)))}
+    setSync("☁️ Synced to your profile");return true
+  }catch(e){dirty.dec=1;dirty.y27=1;setSync("Couldn't sync · saved on this device");return false}}
+async function saveNow(w){save(w);if(remote){clearTimeout(syncTimer);return await push()}return false}
+function flush(){if(remote&&syncTimer){clearTimeout(syncTimer);push()}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flush()});
+window.addEventListener("pagehide",flush);
+async function initSync(){
+  try{
+    await Promise.race([(async()=>{
+      const db=window.claude&&await claude.use("db"), user=window.claude&&await claude.use("user");
+      if(!db||!user)throw new Error("na");
+      const id=await user.id();
+      const col=db.collection("data/users/"+id), ref=col.doc("state"), refY=col.doc("y27");
+      const rd=async r=>{const snap=await r.get();try{const ex=typeof snap.exists==="function"?snap.exists():snap.exists;if(ex!==false)return typeof snap.data==="function"?snap.data():snap.data}catch(e){}return null};
+      const [d,yd]=await Promise.all([rd(ref),rd(refY)]);
+      remote=ref;remoteY=refY;
+      const has=y=>!!(y&&(y.theme||y.vision||(y.items&&y.items.length)));
+      if(d&&Array.isArray(d.goals)&&(d.upd||0)>=(S.upd||0)){const y=S.y27;S=norm({upd:d.upd,goals:d.goals,done:d.done||{},fin:d.fin||{},mood:d.mood||{},note:d.note||{},y27:y})}
+      else dirty.dec=1;
+      if(yd&&(yd.upd||0)>=(S.y27.upd||0)){S.y27={theme:yd.theme||"",vision:yd.vision||"",items:yd.items||[],upd:yd.upd}}
+      else if(!yd&&!has(S.y27)&&has(d&&d.y27)){S.y27=norm({y27:d.y27}).y27;dirty.y27=1}
+      else dirty.y27=1;
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      render();render27();
+      if(dirty.dec||dirty.y27)await push();else setSync("☁️ Synced to your profile");
+    })(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),10000))]);
+  }catch(e){remote=null;setSync("Offline · saved on this device only")}
+}
+let S=load();
+const now=new Date();
+const inDec=now.getMonth()===11, before=now.getMonth()<11;
+const today=inDec?now.getDate():(before?0:31);
+let sel=inDec?now.getDate():1;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const yr=now.getFullYear();
+const dow=d=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(yr,11,d).getDay()];
+const val=(g,d)=>(S.done[g]&&S.done[g][d])||0;
+const isDone=(g,d)=>val(g,d)>0||!!(S.fin&&S.fin[g]&&S.fin[g][d]);
+const finDays=g=>Object.keys((S.fin&&S.fin[g.id])||{}).map(Number).sort((a,b)=>a-b);
+const sumVal=g=>{let s=0;for(let d=1;d<=31;d++)s+=val(g.id,d);return s};
+const daysRead=g=>{let c=0;for(let d=1;d<=31;d++)if(val(g.id,d)>0)c++;return c};
+const prog=g=>g.k==="book"?finDays(g).length:sumVal(g);
+const frac=g=>Math.min(1,prog(g)/(g.t||1));
+function streak(g){let d=sel;if(!isDone(g,d))d--;let n=0;while(d>=1&&isDone(g,d)){n++;d--}return n}
+const anyOn=d=>S.goals.filter(g=>isDone(g.id,d)).length;
+function status(g){
+  const p=prog(g),rem=g.t-p,elapsed=before?0:today,left=before?31:Math.max(0,31-today+1);
+  if(rem<=0)return["Goal reached 🎉","ok",`${p}/${g.t} ${g.u}`];
+  if(elapsed>=31)return["Missed this time","bad",`${rem} short`];
+  if(elapsed===0)return["Not started","",`${g.t} ${g.u} to go`];
+  if(g.k==="book")return["Reading 📖","",`${sumVal(g)} pages so far · ${left} days left`];
+  const expected=g.t*elapsed/31, need=rem/left;
+  const nd=need<1?`~${(need*7).toFixed(1)}/week`:`${need.toFixed(1)}/day`;
+  return p>=expected-0.01?["On track","ok",`${rem} to go · ${left} days left`]:[`Behind · need ${nd}`,"bad",`${rem} to go · ${left} days left`];
+}
+function render(){
+  const n=S.goals.length;
+  $("dateline").textContent=before?`Your December begins in ${Math.ceil((new Date(yr,11,1)-now)/864e5)} days · set your goals now`:now.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+  const qd=(inDec?today:sel)-1;
+  $("quote").textContent="“"+QUOTES[qd%QUOTES.length]+"”";
+  $("nudge").textContent=NUDGES[qd%NUDGES.length];
+  $("days").innerHTML=Array.from({length:31},(_,i)=>{const d=i+1;const full=n>0&&anyOn(d)===n;
+    return `<button class="day${d===sel?" sel":""}${d===today?" today":""}${full?" full":""}" data-d="${d}">${d}<small>${dow(d)}</small></button>`}).join("");
+  const pct=n?Math.round(S.goals.reduce((a,g)=>a+frac(g),0)/n*100):0, r=36, c=2*Math.PI*r;
+  $("ring").innerHTML=`<svg width="84" height="84"><circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--sage)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}"/></svg><b>${pct}%</b>`;
+  const dn=anyOn(sel), reached=S.goals.filter(g=>prog(g)>=g.t).length;
+  $("dayTitle").textContent=`${sel===today?"Today":"December "+sel}: logged ${dn} of ${n}`;
+  $("daySub").textContent=n===0?"Add a goal below to begin.":`Month so far: ${pct}% of all targets · ${reached}/${n} goals reached`;
+  const best=S.goals.reduce((m,g)=>Math.max(m,streak(g)),0);
+  const daysActive=Array.from({length:31},(_,i)=>anyOn(i+1)>0).filter(Boolean).length;
+  $("stats").innerHTML=`<div class="stat"><b>${reached}/${n}</b><span>goals reached</span></div><div class="stat"><b>${daysActive}</b><span>days I showed up</span></div><div class="stat"><b>${best}🔥</b><span>best streak</span></div>`;
+  $("goals").innerHTML=n===0?'<div class="sub" style="padding:12px 0">No goals yet. Add one below.</div>':S.goals.map(g=>{
+    const p=prog(g),[label,cls,sub]=status(g);
+    const ctl=g.k==="book"
+      ?`<input type="number" class="tg pg" min="0" placeholder="pages" value="${val(g.id,sel)||""}" data-pg="${g.id}" title="Pages read on this day" style="width:66px">`
+      :g.k==="total"
+      ?`<div class="step"><button data-dec="${g.id}">−</button><b>${val(g.id,sel)}</b><button data-inc="${g.id}">+</button></div>`
+      :`<button class="chk${isDone(g.id,sel)?" on":""}" data-t="${g.id}">${isDone(g.id,sel)?"✓":""}</button>`;
+    const dots=Array.from({length:31},(_,i)=>`<i class="${isDone(g.id,i+1)?"on":""}${i+1===sel?" cur":""}"></i>`).join("");
+    return `<div class="goal"><div class="top">${ctl}<div class="grow"><div class="gname">${esc(g.e)} ${esc(g.n)}</div><div class="meta">${g.k==="book"?`${p}/${g.t} ${esc(g.u)} finished · ${sumVal(g)} pages · ${daysRead(g)} days read`:`${p}/${g.t} ${esc(g.u)}`} · ${sub}</div></div><span class="badge ${cls}">${label}</span><button class="x" data-r="${g.id}" title="Remove">×</button></div><div class="bar"><i style="width:${frac(g)*100}%"></i></div><div class="dots">${dots}</div>${g.k==="book"?`<div class="meta" style="margin:8px 0 0 38px"><button class="pill" data-fin="${g.id}">${(S.fin[g.id]||{})[sel]?"📕 Finished on this day ✓ (tap to undo)":"📕 Mark book finished on this day"}</button>${finDays(g).length?` Finished: ${finDays(g).map(d=>"Dec "+d).join(", ")}`:""}</div>`:""}<div class="meta" style="margin:8px 0 0 38px">Monthly target <input type="number" class="tg" min="1" value="${g.t}" data-tg="${g.id}"> ${esc(g.u)}${g.k!=="total"?" · streak "+streak(g):""}</div></div>`}).join("");
+  $("menu").innerHTML=MENU.map(([e,t,k,tg,u])=>{const has=S.goals.some(g=>g.n===t);return `<button class="pill${has?" added":""}" data-m="${esc(t)}">${e} ${esc(t)}${has?" ✓":` <span class="meta">· ${tg} ${esc(u)}</span>`}</button>`}).join("");
+  $("moods").innerHTML=MOODS.map((m,i)=>`<button class="mood${S.mood[sel]===i+1?" on":""}" data-mo="${i+1}">${m}</button>`).join("");
+  $("note").value=S.note[sel]||"";
+  $("strip").innerHTML=Array.from({length:31},(_,i)=>`<i class="${S.mood[i+1]?"m"+S.mood[i+1]:""}" title="Dec ${i+1}"></i>`).join("");
+}
+function setVal(id,v){S.done[id]=S.done[id]||{};if(v>0)S.done[id][sel]=v;else delete S.done[id][sel];save();render()}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.d){sel=+t.dataset.d;render();return}
+  if(t.dataset.t){setVal(t.dataset.t,isDone(t.dataset.t,sel)?0:1);return}
+  if(t.dataset.fin){const id=t.dataset.fin;S.fin[id]=S.fin[id]||{};if(S.fin[id][sel])delete S.fin[id][sel];else S.fin[id][sel]=1;save();render();return}
+  if(t.dataset.inc){setVal(t.dataset.inc,val(t.dataset.inc,sel)+1);return}
+  if(t.dataset.dec){setVal(t.dataset.dec,Math.max(0,val(t.dataset.dec,sel)-1));return}
+  if(t.dataset.r){if(t.dataset.armed){S.goals=S.goals.filter(g=>g.id!==t.dataset.r);delete S.done[t.dataset.r];delete S.fin[t.dataset.r];save();render()}else{t.dataset.armed=1;t.textContent="remove?";t.style.fontSize="12px";setTimeout(()=>{if(t.isConnected)render()},2500)}return}
+  if(t.dataset.m&&!t.classList.contains("added")){const m=MENU.find(x=>x[1]===t.dataset.m);S.goals.push({id:uid(),e:m[0],n:m[1],k:m[2],t:m[3],u:m[4]});save();render();return}
+  if(t.dataset.mo){const v=+t.dataset.mo;if(S.mood[sel]===v)delete S.mood[sel];else S.mood[sel]=v;save();render();return}
+});
+document.addEventListener("change",e=>{
+  const i=e.target;
+  if(i.dataset&&i.dataset.pg){setVal(i.dataset.pg,Math.max(0,parseInt(i.value)||0));return}
+  if(i.dataset&&i.dataset.tg){const g=S.goals.find(x=>x.id===i.dataset.tg);if(g){g.t=Math.max(1,parseInt(i.value)||1);save();render()}}
+});
+function addGoal(){
+  const v=$("newGoal").value.trim();if(!v)return;
+  const k=$("newKind").value, t=Math.max(1,parseInt($("newTarget").value)||(k==="days"?15:1));
+  const u=$("newUnit").value.trim()||(k==="days"?"days":k==="book"?"book":"units");
+  S.goals.push({id:uid(),e:"✨",n:v,k,t,u});
+  $("newGoal").value="";$("newTarget").value="";$("newUnit").value="";save();render()}
+$("addBtn").onclick=addGoal;
+$("newGoal").addEventListener("keydown",e=>{if(e.key==="Enter")addGoal()});
+$("note").addEventListener("input",e=>{S.note[sel]=e.target.value;save()});
+
+// ---------- 2027 tab ----------
+const CATS=[["Body","🏃"],["Mind","🧠"],["Heart","💛"],["Career","💼"],["Money","💰"],["Adventure","🌍"],["Creative","🎨"],["Home","🏡"]];
+const WHENS=[["Q1","Jan–Mar"],["Q2","Apr–Jun"],["Q3","Jul–Sep"],["Q4","Oct–Dec"],["Anytime","Whenever it feels right"]];
+const SUG=[["Take a solo trip somewhere new","Adventure","Q2"],["Learn a new skill from scratch","Mind","Q1"],["Run a 10K","Body","Q3"],["Read 12 books","Mind","Anytime"],["Build an emergency fund","Money","Q1"],["Start a creative project","Creative","Q2"],["One full day a month just for me","Heart","Anytime"],["Declutter and refresh my space","Home","Q1"],["Plan a meaningful career step","Career","Q3"]];
+let tab="dec",f27="All",ed27=null,msg27="";
+const catE=c=>(CATS.find(x=>x[0]===c)||["","✨"])[1];
+function render27(){
+  const Y=S.y27,it=Y.items;
+  const editing=ed27===null?!(Y.theme||Y.vision):ed27;
+  $("themeEdit").classList.toggle("hide",!editing);$("themeView").classList.toggle("hide",editing);
+  if(editing){if(document.activeElement!==$("theme27"))$("theme27").value=Y.theme;if(document.activeElement!==$("vision27"))$("vision27").value=Y.vision}
+  else $("themeView").innerHTML=`<div class="serif" style="font-size:26px">${esc(Y.theme)||"My 2027"}</div>${Y.vision?`<p style="font-style:italic;white-space:pre-wrap;margin:10px 0 0">${esc(Y.vision)}</p>`:""}<div class="row" style="margin-top:12px"><button class="pill" id="editTheme">✎ Edit</button><span class="sub">${esc(msg27)}</span></div>`;
+  const total=it.length,done=it.filter(x=>x.s===2).length,ip=it.filter(x=>x.s===1).length;
+  $("sum27").textContent=total?`${Math.round(done/total*100)}% done`:"";
+  $("stats27").innerHTML=`<div class="stat"><b>${total}</b><span>on my list</span></div><div class="stat"><b>${ip}</b><span>in progress</span></div><div class="stat"><b>${done}</b><span>done</span></div>`;
+  $("chips27").innerHTML=["All",...CATS.map(c=>c[0])].map(c=>{const n=c==="All"?total:it.filter(x=>x.c===c).length;return n||c==="All"?`<button class="chip${f27===c?" on":""}" data-f27="${c}">${c==="All"?"All":catE(c)+" "+c} ${n}</button>`:""}).join("");
+  const vis=it.filter(x=>f27==="All"||x.c===f27);
+  $("list27").innerHTML=!total?'<div class="sub" style="padding:12px 0">Nothing yet. Dream a little: add what you want to do with and for yourself in 2027.</div>':WHENS.map(([w,r])=>{
+    const rows=vis.filter(x=>x.q===w);if(!rows.length)return"";
+    return `<div class="qh">${w} · ${r}</div>`+rows.map(x=>`<div class="it"><button class="st s${x.s}" data-st="${x.id}" title="Tap to change status">${["○","◐","●"][x.s]}</button><div class="grow"><div class="${x.s===2?"done":""}">${esc(x.t)}</div><div class="meta">${catE(x.c)} ${esc(x.c)} · ${["Not started","In progress","Done"][x.s]}</div><input type="text" class="note" data-note="${x.id}" placeholder="Why it matters / first small step…" value="${esc(x.note||"")}" maxlength="140"></div><select class="qsel" data-q="${x.id}">${WHENS.map(([k])=>`<option${k===x.q?" selected":""}>${k}</option>`).join("")}</select><button class="x" data-r27="${x.id}" title="Remove">×</button></div>`).join("");
+  }).join("");
+  $("sug27").innerHTML=SUG.map(([t,c,w],i)=>{const has=it.some(x=>x.t===t);return `<button class="pill${has?" added":""}" data-sug="${i}">${catE(c)} ${esc(t)}${has?" ✓":""}</button>`}).join("");
+}
+function flash27(m){$("sum27").textContent=m;setTimeout(render27,2500)}
+document.addEventListener("pointerdown",e=>{if(e.target.closest&&e.target.closest("button"))e.preventDefault()});
+function add27(t,c,w){S.y27.items.push({id:uid(),t,c,q:w,s:0,note:""});save("y27");render27()}
+function showTab(t){tab=t;$("viewDec").classList.toggle("hide",t!=="dec");$("view27").classList.toggle("hide",t!=="y27");
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));if(t==="y27")render27();window.scrollTo(0,0)}
+$("cat27").innerHTML=CATS.map(([c,e])=>`<option value="${c}">${e} ${c}</option>`).join("");
+$("when27").innerHTML=WHENS.map(([w,r])=>`<option value="${w}">${w==="Anytime"?"Anytime":w+" ("+r+")"}</option>`).join("");
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.tab){showTab(t.dataset.tab);return}
+  if(t.dataset.f27){f27=t.dataset.f27;render27();return}
+  if(t.dataset.st){const x=S.y27.items.find(i=>i.id===t.dataset.st);if(x){x.s=(x.s+1)%3;save("y27");render27()}return}
+  if(t.dataset.r27){if(t.dataset.armed){S.y27.items=S.y27.items.filter(i=>i.id!==t.dataset.r27);save("y27");render27()}else{t.dataset.armed=1;t.textContent="remove?";t.style.fontSize="12px";setTimeout(()=>{if(t.isConnected)render27()},2500)}return}
+  if(t.dataset.sug&&!t.classList.contains("added")){const [a,b,c]=SUG[+t.dataset.sug];add27(a,b,c);return}
+  if(t.id==="saveTheme"){S.y27.theme=$("theme27").value.trim();S.y27.vision=$("vision27").value.trim();ed27=false;msg27="Saving…";render27();
+    saveNow("y27").then(ok=>{msg27=ok?"Saved ✓":"Saved on this device";render27()});return}
+  if(t.id==="editTheme"){ed27=true;msg27="";render27();$("theme27").focus();return}
+  if(t.id==="add27"){const v=$("new27").value.trim();
+    if(!v){$("new27").focus();flash27("Type what you'd like to do first ✍️");return}
+    try{add27(v,$("cat27").value,$("when27").value);$("new27").value="";flash27("Added ✓")}catch(err){flash27("Couldn't add: "+err.message)}}
+});
+document.addEventListener("change",e=>{
+  const i=e.target;if(!i.dataset)return;
+  if(i.dataset.note){const x=S.y27.items.find(z=>z.id===i.dataset.note);if(x){x.note=i.value;save("y27")}}
+  if(i.dataset.q){const x=S.y27.items.find(z=>z.id===i.dataset.q);if(x){x.q=i.value;save("y27");render27()}}
+});
+$("new27").addEventListener("keydown",e=>{if(e.key==="Enter")$("add27").click()});
+$("theme27").addEventListener("input",e=>{S.y27.theme=e.target.value;save("y27")});
+$("vision27").addEventListener("input",e=>{S.y27.vision=e.target.value;save("y27")});
+render27();
+render();
+initSync();
+</script>
+</body>
+</html>
