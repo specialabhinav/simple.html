@@ -87,6 +87,7 @@ select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--
 .note{margin-top:6px;padding:6px 10px!important;font-size:12.5px!important}
 .qsel{width:auto!important;padding:4px 6px!important;font-size:12px!important;border-radius:8px!important}
 .footer{text-align:center;color:var(--mute);font-size:12px;margin-top:24px}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
 </head>
 <body>
@@ -176,6 +177,8 @@ select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--
 </div>
 
 <script>
+window.addEventListener("error",e=>{const el=document.getElementById("sync");if(el)el.textContent="⚠️ Error: "+(e.message||"unknown")});
+window.addEventListener("unhandledrejection",e=>{const el=document.getElementById("sync");if(el)el.textContent="⚠️ Error: "+((e.reason&&(e.reason.message||e.reason.code))||e.reason)});
 const QUOTES=[
 "You are allowed to be both a work in progress and a masterpiece.",
 "Start where you are. Speak to yourself as you would to someone you love.",
@@ -238,7 +241,7 @@ async function push(){syncTimer=0;
     if(dirty.dec){dirty.dec=0;const rest=Object.assign({},S);delete rest.y27;await remote.set(JSON.parse(JSON.stringify(rest)))}
     if(dirty.y27){dirty.y27=0;await remoteY.set(JSON.parse(JSON.stringify(S.y27)))}
     setSync("☁️ Synced to your profile");return true
-  }catch(e){dirty.dec=1;dirty.y27=1;setSync("Couldn't sync · saved on this device");return false}}
+  }catch(e){dirty.dec=1;dirty.y27=1;setSync("Couldn't sync · saved on this device ("+((e&&(e.code||e.message))||"unknown")+")");return false}}
 async function saveNow(w){save(w);if(remote){clearTimeout(syncTimer);return await push()}return false}
 function flush(){if(remote&&syncTimer){clearTimeout(syncTimer);push()}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flush()});
@@ -263,7 +266,7 @@ async function initSync(){
       render();render27();
       if(dirty.dec||dirty.y27)await push();else setSync("☁️ Synced to your profile");
     })(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),10000))]);
-  }catch(e){remote=null;setSync("Offline · saved on this device only")}
+  }catch(e){remote=null;setSync("Offline · saved on this device only"+(e&&e.message!=="na"?" ("+(e.code||e.message)+")":""))}
 }
 let S=load();
 const now=new Date();
@@ -374,7 +377,6 @@ function render27(){
   $("sug27").innerHTML=SUG.map(([t,c,w],i)=>{const has=it.some(x=>x.t===t);return `<button class="pill${has?" added":""}" data-sug="${i}">${catE(c)} ${esc(t)}${has?" ✓":""}</button>`}).join("");
 }
 function flash27(m){$("sum27").textContent=m;setTimeout(render27,2500)}
-document.addEventListener("pointerdown",e=>{if(e.target.closest&&e.target.closest("button"))e.preventDefault()});
 function add27(t,c,w){S.y27.items.push({id:uid(),t,c,q:w,s:0,note:""});save("y27");render27()}
 function showTab(t){tab=t;$("viewDec").classList.toggle("hide",t!=="dec");$("view27").classList.toggle("hide",t!=="y27");
   document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));if(t==="y27")render27();window.scrollTo(0,0)}
